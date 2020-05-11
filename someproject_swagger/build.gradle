@@ -1,0 +1,33 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'io.swagger'
+version = '1.0.0'
+
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+repositories {
+     mavenCentral()
+		jcenter()
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+}
+
+dependencies {
+	compile project(':someproject_apilibs')
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'1.5.22.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version:'1.5.22.RELEASE'
+    compile group: 'io.springfox', name: 'springfox-swagger2', version:'2.9.2'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version:'2.9.2'
+    compile group: 'com.github.joschi.jackson', name: 'jackson-datatype-threetenbp', version:'2.6.4'
+	compile("javax.validation:validation-api")
+    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version:'1.5.22.RELEASE') {
+		exclude(module: 'commons-logging')
+    }
+}

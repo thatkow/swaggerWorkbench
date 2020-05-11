@@ -1,0 +1,3 @@
+rootProject.name = 'someproject_swagger'
+include ':someproject_apilibs'
+project(':someproject_apilibs').projectDir = new File(settingsDir, '../someproject_apilibs')
