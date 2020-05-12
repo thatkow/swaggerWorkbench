@@ -1,4 +1,4 @@
-package someproject.SwaggerParser;
+package thatkow.swaggerparser;
 
 import java.io.File;
 import java.util.ArrayList;

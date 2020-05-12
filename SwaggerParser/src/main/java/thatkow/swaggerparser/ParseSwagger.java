@@ -1,4 +1,4 @@
-package someproject;
+package thatkow.swaggerparser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,36 +16,35 @@ import org.apache.commons.io.FileUtils;
 
 import com.google.common.io.Files;
 
-import someproject.SwaggerParser.MavenProject;
-import someproject.SwaggerParser.Project;
-import someproject.SwaggerParser.ProjectPackage;
-import someproject.SwaggerParser.SwaggerParser;
-
 public class ParseSwagger {
 	
-	private static final String DOWNLOADS_FOLDER = "/Users/andrew/Downloads";
-	private static final String PREFIX = "someproject";
-	private static final String PREFIX_APILIBS = PREFIX + "_apilibs";
-	private static final String PREFIX_SWAGGER = PREFIX+"_swagger";
+	private static final String PREFIX_APILIBS = "apilibs";
+	private static final String PREFIX_SWAGGER = "swagger";
 	
 	public static void main(String[] args) throws IOException {
 
+		String downloadsFolder = getVar("DOWNLOADS_FOLDER_PATH");
+		String springServerFolderName = getVar("DOWNLOADED_SERVER_ZIP_FILENAME","spring-server");
+
+		
 		// Look into the downloads folder, and find the latest spring-server project
 		List<File> downloadSpringServers = Arrays
-				.asList(SwaggerParser.listFilesMatching(new File(DOWNLOADS_FOLDER), "^spring-server.*\\d*\\.zip"))
+				.asList(SwaggerParser.listFilesMatching(new File(downloadsFolder), "^"+springServerFolderName+".*\\d*\\.zip"))
 				.stream().collect(Collectors.toList());
 
 		List<Integer> downloadNumber = downloadSpringServers.stream().map(e -> {
 			Pattern p = Pattern.compile("-?\\d+");
 			Matcher m = p.matcher(e.getName());
 			if (!m.find()) {
-				// System.err.println("Cannot extract number from " + e);
 				return Integer.MIN_VALUE;
 			} else {
 				int parseInt = Integer.parseInt(m.group());
 				return Integer.valueOf(parseInt);
 			}
 		}).collect(Collectors.toList());
+		if(downloadNumber.isEmpty()) {
+			throw new RuntimeException("No zip with the name '"+springServerFolderName+"' could be found");
+		}
 
 		File selectedSpringProjZip = downloadSpringServers
 				.get(downloadNumber.indexOf(downloadNumber.stream().mapToInt(e -> e).max().getAsInt()));
@@ -55,7 +54,7 @@ public class ParseSwagger {
 
 		unzip(selectedSpringProjZip.getPath(), selectedSpringProj.getPath());
 
-		Project swaggerExportProject = new MavenProject(new File(selectedSpringProj,"spring-server"));
+		Project swaggerExportProject = new MavenProject(new File(selectedSpringProj,springServerFolderName));
 
 		Project ds14db_swagger = new MavenProject(new File(new File("..").getAbsoluteFile(), PREFIX_SWAGGER));
 		Project ds14db_api = new MavenProject(new File(new File("..").getAbsoluteFile(), PREFIX_APILIBS));
@@ -72,6 +71,20 @@ public class ParseSwagger {
 
 		swaggerParser.parse();
 		FileUtils.deleteDirectory(selectedSpringProj);
+	}
+
+	private static String getVar(String key) {
+		String getenv = System.getProperty(key);
+		if(getenv==null) {
+			throw new RuntimeException("Environment variable '"+key+"' not found");
+		}else {
+			return getenv;
+		}
+	}
+	
+	private static String getVar(String key, String defaultName) {
+		String getenv = System.getenv(key);
+		return getenv != null ? getenv : defaultName;
 	}
 
 	private static void unzip(String zipFilePath, String destDir) {

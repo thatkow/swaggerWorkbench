@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-	compile project(':someproject_apilibs')
+	compile project(':apilibs')
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'1.5.22.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version:'1.5.22.RELEASE'
     compile group: 'io.springfox', name: 'springfox-swagger2', version:'2.9.2'

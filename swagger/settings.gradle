@@ -1,0 +1,3 @@
+rootProject.name = 'swagger'
+include ':apilibs'
+project(':apilibs').projectDir = new File(settingsDir, '../apilibs')
